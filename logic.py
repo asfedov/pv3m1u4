@@ -36,6 +36,14 @@ class Pokemon:
             return stats
         else:
             return {}
+        
+    def set_stat(self, stat_name, value):
+        if stat_name in self.stats:
+            self.stats[stat_name] = value
+            return True
+        else:
+            print(f"Стат {stat_name} не найден у покемона {self.name}")
+            return False
 
     # Метод для получения имени покемона через API
     def get_name(self):

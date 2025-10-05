@@ -36,6 +36,15 @@ def show(message):
     else:
         bot.reply_to(message, "Ты ещё не создал себе покемона, введи /go")
 
+@bot.message_handler(commands=['setstat'])
+def set_stat(message):
+    if message.from_user.username in Pokemon.pokemons.keys():
+        arguments = telebot.util.extract_arguments(message.text).split()
+        pokemon = Pokemon.pokemons[message.from_user.username]
+        is_changed = pokemon.set_stat(arguments[0], int(arguments[1]))
+        bot.send_message(message.chat.id, f"Стат {arguments[0]} изменён на {arguments[1]}" if is_changed else f"Стат {arguments[0]} не найден у покемона {pokemon.name}")
+    else:
+        bot.reply_to(message, "Ты ещё не создал себе покемона, введи /go")
 
 
 bot.infinity_polling(none_stop=True)
