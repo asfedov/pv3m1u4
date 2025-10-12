@@ -19,7 +19,13 @@ class Pokemon:
         self.pokemon_number = randint(1,1000) if not pokemon_number or pokemon_number < 0 or pokemon_number > 1000 else pokemon_number
         self.img = self.get_img()
         self.name = self.get_name()
-        self.stats = self.get_stats()
+        #self.stats = self.get_stats()
+
+
+        hp = randint(40,60) * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
+        power = randint(10,20) * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
+
+        self.stats = {"hp": hp, "maxhp": hp, "power": power}
 
         self.level = 0
         self.xp = 0
@@ -28,13 +34,51 @@ class Pokemon:
 
     def check_shiny(self):
         return True if randint(1,10) <= 4 else False
+    
+    def attack(self, enemy: 'Pokemon'):
+        if isinstance(enemy, Wizard):
+            chance = randint(1,10)
+            if chance <= 3:
+                return f"Маг @{enemy.pokemon_trainer} использовал магию и уклонился от атаки @{self.pokemon_trainer}"
 
-    def feed(self):
-        self.xp += 5 + randint(1,5)
+
+        if enemy.stats["hp"] > self.stats["power"]:
+            enemy.stats["hp"] -= self.stats["power"]
+            self.stats["hp"] -= enemy.stats["power"]
+            if self.stats["hp"] < 0:
+                self.stats["hp"] = 0
+
+                bonusxp = 5 + randint(1,5)
+                enemy.give_exp(bonusxp)
+
+                self.restore()
+                enemy.restore()
+
+                return f"Победа @{enemy.pokemon_trainer} над @{self.pokemon_trainer}! +{bonusxp} XP"
+
+            return f"Сражение @{self.pokemon_trainer} {self.stats['hp']} HP / {self.stats['maxhp']} HP с @{enemy.pokemon_trainer} {enemy.stats['hp']} HP / {enemy.stats['maxhp']} HP"
+        else:
+            enemy.stats["hp"] = 0
+            bonusxp = 5 + randint(1,5)
+            self.give_exp(bonusxp)
+
+            self.restore()
+            enemy.restore()
+
+            return f"Победа @{self.pokemon_trainer} над @{enemy.pokemon_trainer}! +{bonusxp} XP"
+        
+    def restore(self):
+        self.stats["hp"] = self.stats["maxhp"]
+
+    def give_exp(self, amount):
+        self.xp += amount
         if self.xp >= Pokemon.level_up_xp[self.level+1]:
             self.level_up()
             return True
         return False
+
+    def feed(self):
+        self.give_exp(5 + randint(1,5))
     
     def level_info(self):
         return f"Уровень: {self.level}, XP: {self.xp}/{Pokemon.level_up_xp[self.level + 1]}"
@@ -47,8 +91,7 @@ class Pokemon:
             self.scale_stat(stat, Pokemon.shiny_scale_factor if self.is_shiny else Pokemon.scale_factor)
 
     def scale_stat(self, stat_name, factor):
-        self.stats[stat_name] = int(self.stats[stat_name] * factor)
-
+        self.set_stat(stat_name, int(self.stats[stat_name] * factor))
 
     # Метод для получения картинки покемона через API
     def get_img(self):
@@ -60,6 +103,7 @@ class Pokemon:
         else:
             return "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/1.png"
     
+    """
     def get_stats(self):
         url = f'https://pokeapi.co/api/v2/pokemon/{self.pokemon_number}'
         response = requests.get(url)
@@ -71,7 +115,7 @@ class Pokemon:
             return stats
         else:
             return {}
-        
+    """
     def set_stat(self, stat_name, value):
         if stat_name in self.stats:
             self.stats[stat_name] = value
@@ -94,13 +138,48 @@ class Pokemon:
     # Метод класса для получения информации
     def info(self):
         return f"""Имя твоего покемона: {self.name}
-    Статы покемона: {self.stats}
+        Статы покемона: {self.stats}
     {self.level_info()}"""
+
 
     # Метод класса для получения картинки покемона
     def show_img(self):
         return self.img
 
+
+class Fighter(Pokemon):
+    def __init__(self, pokemon_trainer, pokemon_number=None):
+        super().__init__(pokemon_trainer, pokemon_number)
+        self.stats["power"] += 5 * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
+
+
+    def attack(self, enemy):
+        bonus = randint(5,10)
+
+        self.stats["power"] += bonus
+        res = super().attack(enemy)
+        self.stats["power"] -= bonus
+
+        return res + f"\nбонус atk: {bonus}"
+    
+class Wizard(Pokemon):
+    def __init__(self, pokemon_trainer, pokemon_number=None):
+        super().__init__(pokemon_trainer, pokemon_number)
+        self.stats["hp"] += 10 * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
+        self.stats["maxhp"] += 10 * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
+
+    def attack(self, enemy):
+        return super().attack(enemy)
+
+
+def add_pokemon(pokemon_trainer):
+    randpokemon = randint(1, 5)
+    if randpokemon == 1:
+        return Fighter(pokemon_trainer)
+    elif randpokemon == 2:
+        return Wizard(pokemon_trainer)
+    else:
+        return Pokemon(pokemon_trainer)
 
 
 def check_pokemon(bot):
