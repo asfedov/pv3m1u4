@@ -63,8 +63,7 @@ def info(message):
 @check_pokemon(bot)
 def feed(message):
     pokemon = Pokemon.pokemons[message.from_user.id]
-    pokemon.feed()
-    bot.send_message(message.chat.id, f"Ты покормил своего покемона {pokemon.name}.\n")
+    bot.send_message(message.chat.id, pokemon.feed())
 
 """
 @bot.message_handler(commands=['setstat'])

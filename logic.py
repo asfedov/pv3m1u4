@@ -79,7 +79,8 @@ class Pokemon:
             return True
         return False
 
-    def feed(self):
+    def feed_exp(self):
+        print("Feeding exp")
         self.give_exp(5 + randint(1,5))
     
     def level_info(self):
@@ -152,9 +153,9 @@ class Pokemon:
         current_time = datetime.now()
         delta_time = timedelta(seconds=feed_interval)  
         if (current_time - self.last_feed_time) > delta_time:
-            self.hp += hp_increase
+            self.stats["hp"] += hp_increase
             self.last_feed_time = current_time
-            return f"Здоровье покемона увеличено. Текущее здоровье: {self.hp}"
+            return f"Здоровье покемона увеличено. Текущее здоровье: {self.stats["hp"]}"
         else:
             return f"Следующее время кормления покемона: {self.last_feed_time+delta_time}"
 
