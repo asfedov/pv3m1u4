@@ -52,6 +52,20 @@ def attack_pok(message):
     else:
             bot.send_message(message.chat.id, "Чтобы атаковать, нужно ответить на сообщения того, кого хочешь атаковать")
 
+
+@bot.message_handler(commands=['info'])
+@check_pokemon(bot)
+def info(message):
+    pokemon = Pokemon.pokemons[message.from_user.id]
+    bot.send_message(message.chat.id, pokemon.info())
+
+@bot.message_handler(commands=['feed'])
+@check_pokemon(bot)
+def feed(message):
+    pokemon = Pokemon.pokemons[message.from_user.id]
+    pokemon.feed()
+    bot.send_message(message.chat.id, f"Ты покормил своего покемона {pokemon.name}.\n")
+
 """
 @bot.message_handler(commands=['setstat'])
 @check_pokemon(bot)

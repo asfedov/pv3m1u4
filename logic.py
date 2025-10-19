@@ -1,5 +1,6 @@
 from random import randint
 import requests
+from datetime import datetime, timedelta
 
 class Pokemon:
     pokemons = {}
@@ -21,6 +22,7 @@ class Pokemon:
         self.name = self.get_name()
         #self.stats = self.get_stats()
 
+        self.last_feed_time = datetime.now()
 
         hp = randint(40,60) * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
         power = randint(10,20) * ( Pokemon.shiny_scale_factor if self.is_shiny else 1)
@@ -145,6 +147,16 @@ class Pokemon:
     # Метод класса для получения картинки покемона
     def show_img(self):
         return self.img
+    
+    def feed(self, feed_interval = 20, hp_increase = 10 ):
+        current_time = datetime.now()
+        delta_time = timedelta(seconds=feed_interval)  
+        if (current_time - self.last_feed_time) > delta_time:
+            self.hp += hp_increase
+            self.last_feed_time = current_time
+            return f"Здоровье покемона увеличено. Текущее здоровье: {self.hp}"
+        else:
+            return f"Следующее время кормления покемона: {self.last_feed_time+delta_time}"
 
 
 class Fighter(Pokemon):
@@ -162,6 +174,13 @@ class Fighter(Pokemon):
 
         return res + f"\nбонус atk: {bonus}"
     
+    def info(self):
+        return super().info() + "\nТы - тренер боевого покемона! Твой покемон наносит больше урона в бою."
+    
+
+    def feed(self, feed_interval=10, hp_increase=10):
+        return super().feed(feed_interval, hp_increase)
+    
 class Wizard(Pokemon):
     def __init__(self, pokemon_trainer, pokemon_number=None):
         super().__init__(pokemon_trainer, pokemon_number)
@@ -170,8 +189,15 @@ class Wizard(Pokemon):
 
     def attack(self, enemy):
         return super().attack(enemy)
+    
+    def info(self):
+        return super().info() + "\nТы - тренер магического покемона! Твой покемон иногда уклоняется от атак противника."
+    
+    def feed(self, feed_interval=20, hp_increase=20):
+        return super().feed(feed_interval, hp_increase)
 
 
+#рандомизировать тип покемона при создании
 def add_pokemon(pokemon_trainer):
     randpokemon = randint(1, 5)
     if randpokemon == 1:
