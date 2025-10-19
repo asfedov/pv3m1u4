@@ -179,8 +179,8 @@ class Fighter(Pokemon):
         return super().info() + "\nТы - тренер боевого покемона! Твой покемон наносит больше урона в бою."
     
 
-    def feed(self, feed_interval=10, hp_increase=10):
-        return super().feed(feed_interval, hp_increase)
+    def feed(self):
+        return super().feed(feed_interval=10, hp_increase=10)
     
 class Wizard(Pokemon):
     def __init__(self, pokemon_trainer, pokemon_number=None):
@@ -194,8 +194,8 @@ class Wizard(Pokemon):
     def info(self):
         return super().info() + "\nТы - тренер магического покемона! Твой покемон иногда уклоняется от атак противника."
     
-    def feed(self, feed_interval=20, hp_increase=20):
-        return super().feed(feed_interval, hp_increase)
+    def feed(self):
+        return super().feed(feed_interval=20, hp_increase=20)
 
 
 #рандомизировать тип покемона при создании
