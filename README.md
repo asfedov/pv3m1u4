@@ -17,6 +17,11 @@
 
 ---
 
+## ⚙️ Скриншоты проекта
+<img width="390" height="481" alt="image" src="https://github.com/user-attachments/assets/4d4cdc55-48f1-42f5-a63e-f3475512f490" />
+<img width="389" height="154" alt="image" src="https://github.com/user-attachments/assets/1e166f2a-795a-47a1-8ad6-a0911286c1d5" />
+
+
 ## 📦 Структура проекта
 
 ```
